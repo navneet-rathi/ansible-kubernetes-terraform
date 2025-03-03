@@ -18,7 +18,7 @@
     - name: Download Terraform
       when: terraform_check.rc != 0
       get_url:
-        url: "https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip"
+        url: "https://releases.hashicorp.com/terraform/1.11.0/terraform_1.11.0_linux_arm64.zip"
         dest: "/tmp/terraform.zip"
 
     - name: Unzip Terraform
