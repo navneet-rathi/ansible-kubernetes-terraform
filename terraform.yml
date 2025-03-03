@@ -3,6 +3,13 @@
   become: yes  # Run tasks as sudo
   tasks:
 
+    - name: Clone Git Repository if Not Exists, Else Pull Latest Changes
+      ansible.builtin.git:
+        repo: "https://github.com/navneet-rathi/ansible-kubernetes-terraform.git"
+        dest: "/root/ansible-kubernetes-terraform"
+        version: main
+        update: yes
+
     - name: Check if Terraform is Installed
       command: terraform version
       register: terraform_check
@@ -28,11 +35,19 @@
     - debug:
         msg: "Terraform is successfully installed. Version: {{ terraform_verify.stdout }}"
 
-    - name: Initialize Terraform Backend
-      command: terraform init
+    - name: Run Terraform Init
+      community.general.terraform:
+        project_path: "/root/ansible-kubernetes-terraform"
+        state: present
+        force_init: true
 
     - name: Apply Terraform Configuration
-      command: terraform apply -auto-approve
+      community.general.terraform:
+        project_path: "/root/ansible-kubernetes-terraform"
+        state: present
+        force_init: false
+        variables:
+          replicas: 2
 
     - name: Verify Kubernetes Deployment
       command: kubectl get deployments
