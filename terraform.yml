@@ -46,8 +46,6 @@
         project_path: "/root/ansible-kubernetes-terraform"
         state: present
         force_init: false
-        variables:
-          replicas: 2
 
     - name: Verify Kubernetes Deployment
       command: kubectl get deployments
