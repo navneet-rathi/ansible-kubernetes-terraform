@@ -1,0 +1,42 @@
+- name: Ensure Terraform is Installed
+  hosts: all
+  become: yes  # Run tasks as sudo
+  tasks:
+
+    - name: Check if Terraform is Installed
+      command: terraform version
+      register: terraform_check
+      ignore_errors: yes
+
+    - name: Download Terraform
+      when: terraform_check.rc != 0
+      get_url:
+        url: "https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip"
+        dest: "/tmp/terraform.zip"
+
+    - name: Unzip Terraform
+      when: terraform_check.rc != 0
+      unarchive:
+        src: "/tmp/terraform.zip"
+        dest: "/usr/local/bin/"
+        remote_src: yes
+
+    - name: Verify Terraform Installation
+      command: terraform version
+      register: terraform_verify
+
+    - debug:
+        msg: "Terraform is successfully installed. Version: {{ terraform_verify.stdout }}"
+
+    - name: Initialize Terraform Backend
+      command: terraform init
+
+    - name: Apply Terraform Configuration
+      command: terraform apply -auto-approve
+
+    - name: Verify Kubernetes Deployment
+      command: kubectl get deployments
+      register: k8s_deployments
+
+    - debug:
+        msg: "{{ k8s_deployments.stdout }}"
